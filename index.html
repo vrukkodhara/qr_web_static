@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Check-in System</title>
-    <script async src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
     <style>
         * {
             margin: 0;
@@ -29,6 +29,110 @@
             max-width: 500px;
             width: 100%;
             padding: 40px;
+        }
+
+        .registration-section {
+            background: #f0f7ff;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .registration-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .registration-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group button {
+            padding: 10px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-group button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .form-group button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .client-info {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .client-info.show {
+            display: block;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2e7d32;
+        }
+
+        .client-info .btn-small {
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .client-info .btn-small:hover {
+            background: #c82333;
         }
 
         h1 {
@@ -89,6 +193,12 @@
             transform: translateY(0);
         }
 
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .btn-secondary {
             background: #f0f0f0;
             color: #333;
@@ -96,6 +206,11 @@
 
         .btn-secondary:hover {
             background: #e0e0e0;
+        }
+
+        .btn-secondary:disabled {
+            background: #e8e8e8;
+            cursor: not-allowed;
         }
 
         .manual-input {
@@ -225,10 +340,46 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .disabled-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            font-weight: 600;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Registration Section -->
+        <div class="registration-section">
+            <div class="registration-title">👤 Staff Registration</div>
+            <div class="registration-form">
+                <div class="form-group">
+                    <input type="text" id="clientIdInput" placeholder="Staff ID (e.g., staff1)">
+                    <input type="text" id="buildingInput" placeholder="Building (e.g., Tent A)">
+                    <button id="registerBtn">Register</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Info Display -->
+        <div class="client-info" id="clientInfo">
+            <div class="info-label">Registered Client</div>
+            <div class="info-value" id="displayClientId"></div>
+            <div class="info-label" style="margin-top: 10px;">Assigned Batch</div>
+            <div class="info-value" id="displayBatch"></div>
+            <button class="btn-small" id="logoutBtn">Logout</button>
+        </div>
+
         <h1>📱 QR Check-in</h1>
         <p class="subtitle">Scan QR code or enter manually</p>
 
@@ -257,14 +408,13 @@
     </div>
 
     <script>
-        // API Configuration - Change this to your deployed backend URL
         const API_URL = window.location.hostname === 'localhost' 
             ? 'http://localhost:5000'
-            : 'https://qr-scanner-t4qb.onrender.com';  // ← Update this with your deployed backend
-        
+            : 'https://qr-scanner-t4qb.onrender.com'; 
+
         const video = document.getElementById("video");
         const canvas = document.createElement("canvas");
-        const canvasContext = canvas.getContext("2d", { willReadFrequently: true });
+        const canvasContext = canvas.getContext("2d");
         const startBtn = document.getElementById("startBtn");
         const stopBtn = document.getElementById("stopBtn");
         const submitBtn = document.getElementById("submitBtn");
@@ -272,48 +422,138 @@
         const statusCard = document.getElementById("statusCard");
         const historyList = document.getElementById("historyList");
 
+        // Registration elements
+        const clientIdInput = document.getElementById("clientIdInput");
+        const buildingInput = document.getElementById("buildingInput");
+        const registerBtn = document.getElementById("registerBtn");
+        const clientInfo = document.getElementById("clientInfo");
+        const displayClientId = document.getElementById("displayClientId");
+        const displayBatch = document.getElementById("displayBatch");
+        const logoutBtn = document.getElementById("logoutBtn");
+
         let scanning = false;
         let scanHistory = [];
+        let currentClientId = localStorage.getItem("currentClientId") || null;
+        let currentBuilding = localStorage.getItem("currentBuilding") || null;
+
+        // Initialize
+        function initializeApp() {
+            if (currentClientId && currentBuilding) {
+                displayClientInfo();
+                disableScannerSection(false);
+            } else {
+                clientInfo.classList.remove("show");
+                disableScannerSection(true);
+            }
+        }
+
+        // Register client
+        registerBtn.addEventListener("click", async () => {
+            const clientId = clientIdInput.value.trim();
+            const building = buildingInput.value.trim();
+
+            if (!clientId || !building) {
+                alert("Please enter both Staff ID and Building");
+                return;
+            }
+
+            registerBtn.disabled = true;
+            try {
+                const response = await fetch(`${API_URL}/api/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ client_id: clientId, building: building })
+                });
+
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    currentClientId = clientId;
+                    currentBuilding = building;
+                    localStorage.setItem("currentClientId", clientId);
+                    localStorage.setItem("currentBuilding", building);
+                    clientIdInput.value = "";
+                    buildingInput.value = "";
+                    displayClientInfo();
+                    disableScannerSection(false);
+                    alert("✓ Registration successful!");
+                } else {
+                    alert("✗ " + result.message);
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            } finally {
+                registerBtn.disabled = false;
+            }
+        });
+
+        // Display client info
+        function displayClientInfo() {
+            displayClientId.textContent = currentClientId;
+            displayBatch.textContent = currentBuilding;
+            clientInfo.classList.add("show");
+        }
+
+        // Logout
+        logoutBtn.addEventListener("click", () => {
+            currentClientId = null;
+            currentBuilding = null;
+            localStorage.removeItem("currentClientId");
+            localStorage.removeItem("currentBuilding");
+            clientInfo.classList.remove("show");
+            disableScannerSection(true);
+            stopBtn.click();
+            alert("Logged out");
+        });
+
+        // Disable scanner if not registered
+        function disableScannerSection(disabled) {
+            startBtn.disabled = disabled;
+            stopBtn.disabled = disabled;
+            submitBtn.disabled = disabled;
+            qrInput.disabled = disabled;
+        }
 
         // Start camera
         startBtn.addEventListener("click", async () => {
+            if (!currentClientId) {
+                alert("Please register first");
+                return;
+            }
+
             try {
                 console.log("Requesting camera access...");
-                
-                // Try environment camera first, fallback to any camera
                 let stream;
                 try {
                     stream = await navigator.mediaDevices.getUserMedia({
                         video: { facingMode: "environment" }
                     });
                 } catch (e) {
-                    console.log("Environment camera failed, trying any camera...");
+                    console.log("Environment camera failed, trying default...");
                     stream = await navigator.mediaDevices.getUserMedia({
                         video: true
                     });
                 }
-                
-                console.log("Camera stream obtained:", stream);
+
+                console.log("Camera stream obtained");
                 video.srcObject = stream;
                 
-                // Wait for video to load
                 video.onloadedmetadata = () => {
-                    console.log("Video loaded, starting scan...");
-                    video.play();
-                    scanning = true;
-                    startBtn.disabled = true;
-                    stopBtn.disabled = false;
-                    scanQRCode();
+                    console.log("Video metadata loaded, starting scan...");
+                    video.play().then(() => {
+                        scanning = true;
+                        startBtn.disabled = true;
+                        stopBtn.disabled = false;
+                        scanQRCode();
+                    }).catch(err => {
+                        console.error("Play error:", err);
+                        alert("Error playing video: " + err.message);
+                    });
                 };
-                
-                video.onerror = (error) => {
-                    console.error("Video error:", error);
-                    showError("Video playback error");
-                };
-                
+
             } catch (error) {
                 console.error("Camera error:", error);
-                showError("Camera access denied: " + error.message);
+                alert("Camera error: " + error.message);
             }
         });
 
@@ -330,6 +570,10 @@
 
         // Manual submit
         submitBtn.addEventListener("click", () => {
+            if (!currentClientId) {
+                alert("Please register first");
+                return;
+            }
             const qrData = qrInput.value.trim();
             if (qrData) {
                 processQR(qrData);
@@ -344,12 +588,12 @@
         });
 
         // QR scanning loop
+        let scanAttempts = 0;
         function scanQRCode() {
             if (!scanning) return;
 
-            // Check if jsQR is loaded
             if (typeof jsQR === 'undefined') {
-                console.warn("jsQR library loading...");
+                console.log("Waiting for jsQR library...");
                 setTimeout(scanQRCode, 100);
                 return;
             }
@@ -358,9 +602,9 @@
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
-                    
+
                     if (canvas.width === 0 || canvas.height === 0) {
-                        console.warn("Waiting for video dimensions...");
+                        console.warn("Canvas dimensions invalid:", canvas.width, canvas.height);
                         requestAnimationFrame(scanQRCode);
                         return;
                     }
@@ -369,21 +613,32 @@
 
                     try {
                         const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-                        const code = jsQR(imageData.data, canvas.width, canvas.height);
+                        const code = jsQR(imageData.data, canvas.width, canvas.height, {
+                            inversionAttempts: "dontInvert"
+                        });
+
+                        scanAttempts++;
+                        if (scanAttempts % 30 === 0) {
+                            console.log(`Scanning... (${scanAttempts} attempts, canvas: ${canvas.width}x${canvas.height})`);
+                        }
 
                         if (code) {
-                            console.log("✓ QR Code detected:", code.data);
-                            processQR(code.data);
+                            console.log("✓✓✓ QR CODE DETECTED ✓✓✓");
+                            console.log("QR Data:", code.data);
+                            const detectedData = code.data;
                             scanning = false;
+                            processQR(detectedData);
                             stopBtn.click();
                             return;
                         }
                     } catch (e) {
                         console.error("jsQR error:", e);
                     }
+                } else {
+                    console.warn("Video not ready. State:", video.readyState, "Expected:", video.HAVE_ENOUGH_DATA);
                 }
             } catch (e) {
-                console.error("Scan loop error:", e);
+                console.error("Scan error:", e);
             }
 
             requestAnimationFrame(scanQRCode);
@@ -396,42 +651,74 @@
                 const response = await fetch(`${API_URL}/api/scan`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ qr_data: qrData })
+                    body: JSON.stringify({
+                        qr_data: qrData,
+                        client_id: currentClientId
+                    })
                 });
 
                 const result = await response.json();
+                console.log("Backend message:", result.message);
                 addToHistory(result, response.ok);
                 displayStatus(result, response.ok);
             } catch (error) {
-                console.error("Fetch error:", error);
                 const errorResult = { message: "Network error: " + error.message };
                 addToHistory(errorResult, false);
                 showError(errorResult.message);
             }
         }
 
+        //Check-in status
+        function getStatusFromMessage(message) {
+            if (!message) return "UNKNOWN";
+            return message.toLowerCase().includes("out")
+                ? "CHECKED OUT"
+                : "CHECKED IN";
+        }
+
+
         // Display status
         function displayStatus(result, success) {
             const statusTitle = document.getElementById("statusTitle");
             const statusDetails = document.getElementById("statusDetails");
 
+
             statusCard.classList.remove("status-success", "status-error");
 
             if (success) {
+                const status = getStatusFromMessage(result.message);
                 statusCard.classList.add("status-success");
-                statusTitle.textContent = "✓ " + result.message;
+                statusTitle.textContent = `✓ ${status}`;
+                //statusTitle.textContent = "✓ " + result.message;
                 statusDetails.innerHTML = `
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value"><strong>${status}</strong></span>
+                    </div>
+
                     <div class="detail-row">
                         <span class="detail-label">ID:</span>
                         <span class="detail-value">${result.id}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Status:</span>
-                        <span class="detail-value">${result.status}</span>
+                        <span class="detail-label">Group Head Name:</span>
+                        <span class="detail-value">${result.group_head_name}</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Check-in Count:</span>
-                        <span class="detail-value">${result.count}</span>
+                        <span class="detail-label">Token #:</span>
+                        <span class="detail-value">${result.token}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Men:</span>
+                        <span class="detail-value">${result.tent_men || 'N/A'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Total Women:</span>
+                        <span class="detail-value">${result.tent_women || 'N/A'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Building:</span>
+                        <span class="detail-value">${result.building}</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Time:</span>
@@ -440,8 +727,41 @@
                 `;
             } else {
                 statusCard.classList.add("status-error");
-                statusTitle.textContent = "✗ Error";
-                statusDetails.innerHTML = `<div>${result.message}</div>`;
+                statusTitle.textContent = "✗ " + result.message;
+                
+                // Check if this is a building mismatch error
+                if (result.correct_building && result.client_building) {
+                    statusDetails.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <strong>⚠️ Wrong Building!</strong>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Group Head:</span>
+                            <span class="detail-value">${result.pilgrim.name}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Token #:</span>
+                            <span class="detail-value">${result.pilgrim.id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Correct Building:</span>
+                            <span class="detail-value" style="font-weight: 700; color: #c82333;">${result.correct_building}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Men's Tent:</span>
+                            <span class="detail-value">${result.tent_men || 'N/A'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Women's Tent:</span>
+                            <span class="detail-value">${result.tent_women || 'N/A'}</span>
+                        </div>
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(255,0,0,0.15); border-radius: 4px; text-align: center;">
+                            <strong style="color: #c82333;">Guide pilgrim to ${result.correct_building} Tent ${result.tent_men} for Men and Tent ${result.tent_women} for Women</strong>
+                        </div>
+                    `;
+                } else {
+                    statusDetails.innerHTML = `<div>${result.message}</div>`;
+                }
             }
 
             statusCard.style.display = "block";
@@ -458,9 +778,11 @@
             const item = document.createElement("div");
             item.className = "history-item" + (success ? "" : " error");
 
+            const status = getStatusFromMessage(result.message);
             const message = success
-                ? `✓ ${result.id} - ${result.status}`
+                ? `✓ ${status}`
                 : `✗ ${result.message}`;
+
 
             item.innerHTML = `
                 <div>${message}</div>
@@ -469,14 +791,24 @@
 
             historyList.insertBefore(item, historyList.firstChild);
 
-            // Keep only last 10 items
             while (historyList.children.length > 10) {
                 historyList.removeChild(historyList.lastChild);
             }
         }
 
-        // Initialize
+        // Initialize on page load
+        initializeApp();
         stopBtn.disabled = true;
+
+        // Check if jsQR loaded
+        setTimeout(() => {
+            if (typeof jsQR === 'undefined') {
+                console.error("❌ jsQR library failed to load!");
+                alert("QR scanner library failed to load. Try refreshing the page.");
+            } else {
+                console.log("✓ jsQR library loaded successfully!");
+            }
+        }, 2000);
     </script>
 </body>
 </html>
