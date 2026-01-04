@@ -365,8 +365,13 @@
             <div class="registration-form">
                 <div class="form-group">
                     <input type="text" id="clientIdInput" placeholder="Staff ID (e.g., staff1)">
-                    <input type="text" id="buildingInput" placeholder="Building (e.g., Tent A)">
+                    <input type="password" id="passwordInput" placeholder="Password">
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" id="buildingInput" placeholder="Building (for Register)">
                     <button id="registerBtn">Register</button>
+                    <button id="loginBtn" class="btn-secondary">Login</button>
                 </div>
             </div>
         </div>
@@ -408,9 +413,21 @@
     </div>
 
     <script>
-        const API_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:5000'
-            : 'https://qr-scanner-t4qb.onrender.com'; 
+        // Detect environment and set API URL
+        const getAPIUrl = () => {
+            const hostname = window.location.hostname;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost:5000';
+            }
+            // Production
+            //return 'https://qr-scanner-t4qb.onrender.com'
+            return window.location.origin;
+        };
+
+        //const API_URL = getAPIUrl();
+        const API_URL = 'https://qr-scanner-t4qb.onrender.com';
+        console.log('Using API URL:', API_URL);
 
         const video = document.getElementById("video");
         const canvas = document.createElement("canvas");
@@ -430,11 +447,34 @@
         const displayClientId = document.getElementById("displayClientId");
         const displayBatch = document.getElementById("displayBatch");
         const logoutBtn = document.getElementById("logoutBtn");
+        
+        //login details
+        const passwordInput = document.getElementById("passwordInput");
+        const loginBtn = document.getElementById("loginBtn");
 
         let scanning = false;
         let scanHistory = [];
         let currentClientId = localStorage.getItem("currentClientId") || null;
         let currentBuilding = localStorage.getItem("currentBuilding") || null;
+        let isLoginMode = false;
+
+        function setMode(loginMode) {
+            isLoginMode = loginMode;
+            buildingInput.style.display = loginMode ? "none" : "block";
+            registerBtn.style.display = "block";
+            loginBtn.style.display = "block";
+        }
+
+        // default = Register mode
+        setMode(false);
+
+        loginBtn.addEventListener("click", () => {
+            setMode(true);
+        });
+
+        registerBtn.addEventListener("click", () => {
+            setMode(false);
+        });
 
         // Initialize
         function initializeApp() {
@@ -450,40 +490,104 @@
         // Register client
         registerBtn.addEventListener("click", async () => {
             const clientId = clientIdInput.value.trim();
+            const password = passwordInput.value.trim();
             const building = buildingInput.value.trim();
 
-            if (!clientId || !building) {
-                alert("Please enter both Staff ID and Building");
+            if (!clientId || !password || !building) {
+                alert("Please enter Staff ID, Password, and Building");
                 return;
             }
 
             registerBtn.disabled = true;
+
             try {
                 const response = await fetch(`${API_URL}/api/register`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ client_id: clientId, building: building })
+                    body: JSON.stringify({
+                        client_id: clientId,
+                        password: password,
+                        building: building
+                    })
                 });
 
                 const result = await response.json();
+                console.log('Register response:', result);
 
                 if (result.status === "success") {
                     currentClientId = clientId;
                     currentBuilding = building;
+
                     localStorage.setItem("currentClientId", clientId);
                     localStorage.setItem("currentBuilding", building);
+
                     clientIdInput.value = "";
+                    passwordInput.value = "";
                     buildingInput.value = "";
+
                     displayClientInfo();
                     disableScannerSection(false);
+
                     alert("✓ Registration successful!");
                 } else {
                     alert("✗ " + result.message);
                 }
             } catch (error) {
+                console.error('Register error:', error);
                 alert("Error: " + error.message);
             } finally {
                 registerBtn.disabled = false;
+            }
+        });
+
+        //Login Button event listener
+        loginBtn.addEventListener("click", async () => {
+            const clientId = clientIdInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!clientId || !password) {
+                alert("Please enter Staff ID and Password");
+                return;
+            }
+
+            loginBtn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        client_id: clientId,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Login response:', result);
+
+                // ✓ FIXED: Check for "success" field, not "status"
+                if (result.success === true) {
+                    currentClientId = result.client_id;
+                    currentBuilding = result.building;
+
+                    localStorage.setItem("currentClientId", currentClientId);
+                    localStorage.setItem("currentBuilding", currentBuilding);
+
+                    clientIdInput.value = "";
+                    passwordInput.value = "";
+
+                    displayClientInfo();
+                    disableScannerSection(false);
+
+                    alert("✓ Login successful");
+                } else {
+                    alert("✗ " + (result.message || "Login failed"));
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert("Login error: " + error.message);
+            } finally {
+                loginBtn.disabled = false;
             }
         });
 
@@ -676,12 +780,10 @@
                 : "CHECKED IN";
         }
 
-
         // Display status
         function displayStatus(result, success) {
             const statusTitle = document.getElementById("statusTitle");
             const statusDetails = document.getElementById("statusDetails");
-
 
             statusCard.classList.remove("status-success", "status-error");
 
@@ -689,7 +791,6 @@
                 const status = getStatusFromMessage(result.message);
                 statusCard.classList.add("status-success");
                 statusTitle.textContent = `✓ ${status}`;
-                //statusTitle.textContent = "✓ " + result.message;
                 statusDetails.innerHTML = `
                     <div class="detail-row">
                         <span class="detail-label">Status:</span>
@@ -782,7 +883,6 @@
             const message = success
                 ? `✓ ${status}`
                 : `✗ ${result.message}`;
-
 
             item.innerHTML = `
                 <div>${message}</div>
