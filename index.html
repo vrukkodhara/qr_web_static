@@ -13,13 +13,13 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
         }
 
         .container {
@@ -28,50 +28,111 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 500px;
             width: 100%;
-            padding: 40px;
+            padding: 24px;
         }
 
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Registration Section */
         .registration-section {
-            background: #f0f7ff;
-            border: 2px solid #667eea;
+            background: #f8faff;
+            border: 1px solid #e0e8f7;
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .registration-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .registration-form {
+        .auth-tabs {
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #e0e8f7;
+            background: white;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
         }
 
         .form-group {
             display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-        .form-group input {
-            flex: 1;
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        input[type="text"],
+        input[type="password"] {
             padding: 10px 12px;
-            border: 2px solid #e0e0e0;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
             font-size: 13px;
-            transition: border-color 0.3s;
+            transition: all 0.3s;
+            font-family: inherit;
         }
 
-        .form-group input:focus {
+        input[type="text"]:focus,
+        input[type="password"]:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .form-group button {
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-register,
+        .btn-login {
             padding: 10px 16px;
             background: #667eea;
             color: white;
@@ -83,22 +144,25 @@
             transition: all 0.3s ease;
         }
 
-        .form-group button:hover {
+        .btn-register:hover,
+        .btn-login:hover {
             background: #5568d3;
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
-        .form-group button:disabled {
+        .btn-register:disabled,
+        .btn-login:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
         }
 
+        /* Client Info */
         .client-info {
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
-            border-radius: 8px;
-            padding: 12px;
+            background: #ecf5e9;
+            border: 1px solid #81c784;
+            border-radius: 12px;
+            padding: 16px;
             margin-bottom: 20px;
             display: none;
         }
@@ -107,50 +171,53 @@
             display: block;
         }
 
-        .info-label {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
-        .info-value {
-            font-size: 16px;
+        .info-header .title {
+            font-size: 13px;
             font-weight: 700;
             color: #2e7d32;
         }
 
-        .client-info .btn-small {
-            margin-top: 8px;
-            padding: 6px 12px;
+        .info-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 12px;
+        }
+
+        .btn-logout {
+            padding: 8px 12px;
             background: #dc3545;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.3s;
         }
 
-        .client-info .btn-small:hover {
+        .btn-logout:hover {
             background: #c82333;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
+        /* Scanner Section */
         .scanner-section {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         video {
@@ -158,21 +225,22 @@
             border-radius: 12px;
             background: #f0f0f0;
             display: block;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
-        .button-group {
-            display: flex;
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        button {
-            flex: 1;
-            padding: 12px 20px;
+        .btn-primary,
+        .btn-secondary {
+            padding: 11px 16px;
             border: none;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -185,12 +253,7 @@
 
         .btn-primary:hover {
             background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
 
         .btn-primary:disabled {
@@ -214,31 +277,26 @@
         }
 
         .manual-input {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto;
             gap: 10px;
-            margin-top: 15px;
         }
 
-        input[type="text"] {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
+        input[type="text"].qr-field {
+            padding: 11px 12px;
+            border: 1px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
+            font-size: 13px;
         }
 
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
+        /* Status Card */
         .status-card {
-            padding: 20px;
+            padding: 16px;
             border-radius: 12px;
             margin-bottom: 20px;
             display: none;
             animation: slideIn 0.3s ease;
+            border-left: 4px solid;
         }
 
         @keyframes slideIn {
@@ -254,61 +312,67 @@
 
         .status-success {
             background: #d4edda;
-            border-left: 4px solid #28a745;
+            border-left-color: #28a745;
             color: #155724;
         }
 
         .status-error {
             background: #f8d7da;
-            border-left: 4px solid #dc3545;
+            border-left-color: #dc3545;
             color: #721c24;
         }
 
         .status-title {
             font-weight: 700;
-            font-size: 16px;
-            margin-bottom: 8px;
+            font-size: 15px;
+            margin-bottom: 10px;
         }
 
         .status-details {
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
         .detail-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 6px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
         }
 
         .detail-label {
             font-weight: 600;
-            color: rgba(0, 0, 0, 0.7);
         }
 
         .detail-value {
             font-weight: 500;
+            text-align: right;
         }
 
+        /* History */
         .history {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #f0f0f0;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #f0f0f0;
         }
 
         .history-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #333;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .history-item {
-            padding: 12px;
+            padding: 10px 12px;
             background: #f9f9f9;
             border-radius: 8px;
-            margin-bottom: 10px;
-            font-size: 13px;
+            margin-bottom: 8px;
+            font-size: 12px;
             border-left: 3px solid #667eea;
         }
 
@@ -319,93 +383,89 @@
 
         .history-time {
             color: #999;
-            font-size: 12px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 3px solid #f0f0f0;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .disabled-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 16px;
-            font-weight: 600;
-            color: #666;
+            font-size: 11px;
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Amartithi Pilgrims</h1>
+            <p>📱 QR Check-in</p>
+        </div>
+
         <!-- Registration Section -->
         <div class="registration-section">
-            <div class="registration-title">👤 Staff Registration</div>
-            <div class="registration-form">
+            <div class="registration-title">👤 Staff Access</div>
+            
+            <div class="auth-tabs">
+                <button class="tab-btn active" id="registerTab">Register</button>
+                <button class="tab-btn" id="loginTab">Login</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm">
                 <div class="form-group">
-                    <input type="text" id="clientIdInput" placeholder="Staff ID (e.g., staff1)">
-                    <input type="password" id="passwordInput" placeholder="Password">
+                    <input type="text" id="regClientId" placeholder="Staff ID (e.g., staff1)">
+                    <input type="password" id="regPassword" placeholder="Password">
                 </div>
-                
+                <div class="form-row full">
+                    <input type="text" id="regBuilding" placeholder="Tent Assignment">
+                </div>
+                <div class="form-row">
+                    <button class="btn-register" id="registerBtn">Register</button>
+                    <button class="btn-secondary" style="cursor: pointer;" onclick="document.getElementById('loginTab').click()">Have Account?</button>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" style="display: none;">
                 <div class="form-group">
-                    <input type="text" id="buildingInput" placeholder="Tent (for Register)">
-                    <button id="registerBtn">Register</button>
-                    <button id="loginBtn" class="btn-secondary">Login</button>
+                    <input type="text" id="loginClientId" placeholder="Staff ID">
+                    <input type="password" id="loginPassword" placeholder="Password">
+                </div>
+                <div class="form-row">
+                    <button class="btn-login" id="loginBtn">Login</button>
+                    <button class="btn-secondary" style="cursor: pointer;" onclick="document.getElementById('registerTab').click()">New User?</button>
                 </div>
             </div>
         </div>
 
         <!-- Client Info Display -->
         <div class="client-info" id="clientInfo">
-            <div class="info-label">Registered Client</div>
+            <div class="info-header">
+                <span class="title">✓ Logged in as</span>
+                <button class="btn-logout" id="logoutBtn">Logout</button>
+            </div>
+            <div class="info-label">Volunteer ID</div>
             <div class="info-value" id="displayClientId"></div>
-            <div class="info-label" style="margin-top: 10px;">Assigned Batch</div>
+            <div class="info-label">Assigned Tent</div>
             <div class="info-value" id="displayBatch"></div>
-            <button class="btn-small" id="logoutBtn">Logout</button>
         </div>
 
-        <h1>📱 QR Check-in</h1>
-        <p class="subtitle">Scan QR code or enter manually</p>
-
+        <!-- Scanner Section -->
         <div class="scanner-section">
             <video id="video" playsinline></video>
-            <div class="button-group">
+            <div class="control-buttons">
                 <button class="btn-primary" id="startBtn">Start Camera</button>
                 <button class="btn-secondary" id="stopBtn">Stop Camera</button>
             </div>
 
             <div class="manual-input">
-                <input type="text" id="qrInput" placeholder="Or paste QR data here...">
-                <button class="btn-primary" id="submitBtn">Submit</button>
+                <input type="text" id="qrInput" class="qr-field" placeholder="Or paste QR code...">
+                <button class="btn-primary" id="submitBtn" style="min-width: 80px;">Submit</button>
             </div>
         </div>
 
+        <!-- Status Card -->
         <div class="status-card" id="statusCard">
             <div class="status-title" id="statusTitle"></div>
             <div class="status-details" id="statusDetails"></div>
         </div>
 
+        <!-- History -->
         <div class="history" id="historySection">
             <div class="history-title">Recent Scans</div>
             <div id="historyList"></div>
@@ -413,19 +473,6 @@
     </div>
 
     <script>
-        // Detect environment and set API URL
-        const getAPIUrl = () => {
-            const hostname = window.location.hostname;
-            
-            if (hostname === 'localhost' || hostname === '127.0.0.1') {
-                return 'http://localhost:5000';
-            }
-            // Production
-            //return 'https://qr-scanner-t4qb.onrender.com'
-            return window.location.origin;
-        };
-
-        //const API_URL = getAPIUrl();
         const API_URL = 'https://qr-scanner-t4qb.onrender.com';
         console.log('Using API URL:', API_URL);
 
@@ -439,265 +486,195 @@
         const statusCard = document.getElementById("statusCard");
         const historyList = document.getElementById("historyList");
 
+        // Auth tabs
+        const registerTab = document.getElementById("registerTab");
+        const loginTab = document.getElementById("loginTab");
+        const registerForm = document.getElementById("registerForm");
+        const loginForm = document.getElementById("loginForm");
+
         // Registration elements
-        const clientIdInput = document.getElementById("clientIdInput");
-        const buildingInput = document.getElementById("buildingInput");
+        const regClientId = document.getElementById("regClientId");
+        const regPassword = document.getElementById("regPassword");
+        const regBuilding = document.getElementById("regBuilding");
         const registerBtn = document.getElementById("registerBtn");
+
+        // Login elements
+        const loginClientId = document.getElementById("loginClientId");
+        const loginPassword = document.getElementById("loginPassword");
+        const loginBtn = document.getElementById("loginBtn");
+
+        // Info display
         const clientInfo = document.getElementById("clientInfo");
         const displayClientId = document.getElementById("displayClientId");
         const displayBatch = document.getElementById("displayBatch");
         const logoutBtn = document.getElementById("logoutBtn");
-        
-        //login details
-        const passwordInput = document.getElementById("passwordInput");
-        const loginBtn = document.getElementById("loginBtn");
 
         let scanning = false;
-        let scanHistory = [];
         let currentClientId = localStorage.getItem("currentClientId") || null;
         let currentBuilding = localStorage.getItem("currentBuilding") || null;
-        let isLoginMode = false;
 
-        function setMode(loginMode) {
-            isLoginMode = loginMode;
-            buildingInput.style.display = loginMode ? "none" : "block";
-            registerBtn.style.display = "block";
-            loginBtn.style.display = "block";
-        }
-
-        // default = Register mode
-        setMode(false);
-
-        loginBtn.addEventListener("click", () => {
-            setMode(true);
+        // Tab switching
+        registerTab.addEventListener("click", () => {
+            registerForm.style.display = "block";
+            loginForm.style.display = "none";
+            registerTab.classList.add("active");
+            loginTab.classList.remove("active");
         });
 
-        registerBtn.addEventListener("click", () => {
-            setMode(false);
+        loginTab.addEventListener("click", () => {
+            loginForm.style.display = "block";
+            registerForm.style.display = "none";
+            loginTab.classList.add("active");
+            registerTab.classList.remove("active");
         });
 
-        // Initialize
-        function initializeApp() {
-            if (currentClientId && currentBuilding) {
-                displayClientInfo();
-                disableScannerSection(false);
-            } else {
-                clientInfo.classList.remove("show");
-                disableScannerSection(true);
-            }
-        }
-
-        // Register client
+        // Register
         registerBtn.addEventListener("click", async () => {
-            const clientId = clientIdInput.value.trim();
-            const password = passwordInput.value.trim();
-            const building = buildingInput.value.trim();
+            const clientId = regClientId.value.trim();
+            const password = regPassword.value.trim();
+            const building = regBuilding.value.trim();
 
             if (!clientId || !password || !building) {
-                alert("Please enter Staff ID, Password, and Building");
+                alert("Please fill all fields");
                 return;
             }
 
             registerBtn.disabled = true;
-
             try {
                 const response = await fetch(`${API_URL}/api/register`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        client_id: clientId,
-                        password: password,
-                        building: building
-                    })
+                    body: JSON.stringify({ client_id: clientId, password, building })
                 });
 
                 const result = await response.json();
-                console.log('Register response:', result);
-
                 if (result.status === "success") {
                     currentClientId = clientId;
                     currentBuilding = building;
-
                     localStorage.setItem("currentClientId", clientId);
                     localStorage.setItem("currentBuilding", building);
-
-                    clientIdInput.value = "";
-                    passwordInput.value = "";
-                    buildingInput.value = "";
-
+                    regClientId.value = regPassword.value = regBuilding.value = "";
                     displayClientInfo();
                     disableScannerSection(false);
-
                     alert("✓ Registration successful!");
                 } else {
                     alert("✗ " + result.message);
                 }
             } catch (error) {
-                console.error('Register error:', error);
                 alert("Error: " + error.message);
             } finally {
                 registerBtn.disabled = false;
             }
         });
 
-        //Login Button event listener
+        // Login
         loginBtn.addEventListener("click", async () => {
-            const clientId = clientIdInput.value.trim();
-            const password = passwordInput.value.trim();
+            const clientId = loginClientId.value.trim();
+            const password = loginPassword.value.trim();
 
             if (!clientId || !password) {
-                alert("Please enter Staff ID and Password");
+                alert("Please enter credentials");
                 return;
             }
 
             loginBtn.disabled = true;
-
             try {
                 const response = await fetch(`${API_URL}/api/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        client_id: clientId,
-                        password: password
-                    })
+                    body: JSON.stringify({ client_id: clientId, password })
                 });
 
                 const result = await response.json();
-                console.log('Login response:', result);
-
-                // ✓ FIXED: Check for "success" field, not "status"
                 if (result.success === true) {
                     currentClientId = result.client_id;
                     currentBuilding = result.building;
-
                     localStorage.setItem("currentClientId", currentClientId);
                     localStorage.setItem("currentBuilding", currentBuilding);
-
-                    clientIdInput.value = "";
-                    passwordInput.value = "";
-
+                    loginClientId.value = loginPassword.value = "";
                     displayClientInfo();
                     disableScannerSection(false);
-
-                    alert("✓ Login successful");
+                    alert("✓ Login successful!");
                 } else {
                     alert("✗ " + (result.message || "Login failed"));
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                alert("Login error: " + error.message);
+                alert("Error: " + error.message);
             } finally {
                 loginBtn.disabled = false;
             }
         });
 
-        // Display client info
         function displayClientInfo() {
             displayClientId.textContent = currentClientId;
             displayBatch.textContent = currentBuilding;
             clientInfo.classList.add("show");
         }
 
-        // Logout
         logoutBtn.addEventListener("click", () => {
-            currentClientId = null;
-            currentBuilding = null;
+            currentClientId = currentBuilding = null;
             localStorage.removeItem("currentClientId");
             localStorage.removeItem("currentBuilding");
             clientInfo.classList.remove("show");
             disableScannerSection(true);
             stopBtn.click();
-            alert("Logged out");
         });
 
-        // Disable scanner if not registered
         function disableScannerSection(disabled) {
-            startBtn.disabled = disabled;
-            stopBtn.disabled = disabled;
-            submitBtn.disabled = disabled;
-            qrInput.disabled = disabled;
+            startBtn.disabled = stopBtn.disabled = submitBtn.disabled = qrInput.disabled = disabled;
         }
 
-        // Start camera
         startBtn.addEventListener("click", async () => {
             if (!currentClientId) {
-                alert("Please register first");
+                alert("Please login first");
                 return;
             }
 
             try {
-                console.log("Requesting camera access...");
-                let stream;
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: "environment" }
-                    });
-                } catch (e) {
-                    console.log("Environment camera failed, trying default...");
-                    stream = await navigator.mediaDevices.getUserMedia({
-                        video: true
-                    });
-                }
+                let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                    .catch(() => navigator.mediaDevices.getUserMedia({ video: true }));
 
-                console.log("Camera stream obtained");
                 video.srcObject = stream;
-                
                 video.onloadedmetadata = () => {
-                    console.log("Video metadata loaded, starting scan...");
                     video.play().then(() => {
                         scanning = true;
                         startBtn.disabled = true;
                         stopBtn.disabled = false;
                         scanQRCode();
-                    }).catch(err => {
-                        console.error("Play error:", err);
-                        alert("Error playing video: " + err.message);
                     });
                 };
-
             } catch (error) {
-                console.error("Camera error:", error);
                 alert("Camera error: " + error.message);
             }
         });
 
-        // Stop camera
         stopBtn.addEventListener("click", () => {
             const stream = video.srcObject;
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
+            if (stream) stream.getTracks().forEach(track => track.stop());
             scanning = false;
             startBtn.disabled = false;
             stopBtn.disabled = true;
         });
 
-        // Manual submit
         submitBtn.addEventListener("click", () => {
             if (!currentClientId) {
-                alert("Please register first");
+                alert("Please login first");
                 return;
             }
-            const qrData = qrInput.value.trim();
-            if (qrData) {
-                processQR(qrData);
+            const data = qrInput.value.trim();
+            if (data) {
+                processQR(data);
                 qrInput.value = "";
             }
         });
 
         qrInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                submitBtn.click();
-            }
+            if (e.key === "Enter") submitBtn.click();
         });
 
-        // QR scanning loop
-        let scanAttempts = 0;
         function scanQRCode() {
             if (!scanning) return;
-
             if (typeof jsQR === 'undefined') {
-                console.log("Waiting for jsQR library...");
                 setTimeout(scanQRCode, 100);
                 return;
             }
@@ -706,40 +683,16 @@
                 if (video.readyState === video.HAVE_ENOUGH_DATA) {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
+                    canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "dontInvert" });
 
-                    if (canvas.width === 0 || canvas.height === 0) {
-                        console.warn("Canvas dimensions invalid:", canvas.width, canvas.height);
-                        requestAnimationFrame(scanQRCode);
+                    if (code) {
+                        scanning = false;
+                        processQR(code.data);
+                        stopBtn.click();
                         return;
                     }
-
-                    canvasContext.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    try {
-                        const imageData = canvasContext.getImageData(0, 0, canvas.width, canvas.height);
-                        const code = jsQR(imageData.data, canvas.width, canvas.height, {
-                            inversionAttempts: "dontInvert"
-                        });
-
-                        scanAttempts++;
-                        if (scanAttempts % 30 === 0) {
-                            console.log(`Scanning... (${scanAttempts} attempts, canvas: ${canvas.width}x${canvas.height})`);
-                        }
-
-                        if (code) {
-                            console.log("✓✓✓ QR CODE DETECTED ✓✓✓");
-                            console.log("QR Data:", code.data);
-                            const detectedData = code.data;
-                            scanning = false;
-                            processQR(detectedData);
-                            stopBtn.click();
-                            return;
-                        }
-                    } catch (e) {
-                        console.error("jsQR error:", e);
-                    }
-                } else {
-                    console.warn("Video not ready. State:", video.readyState, "Expected:", video.HAVE_ENOUGH_DATA);
                 }
             } catch (e) {
                 console.error("Scan error:", e);
@@ -748,39 +701,29 @@
             requestAnimationFrame(scanQRCode);
         }
 
-        // Process QR data
         async function processQR(qrData) {
             try {
                 statusCard.style.display = "none";
                 const response = await fetch(`${API_URL}/api/scan`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        qr_data: qrData,
-                        client_id: currentClientId
-                    })
+                    body: JSON.stringify({ qr_data: qrData, client_id: currentClientId })
                 });
 
                 const result = await response.json();
-                console.log("Backend message:", result.message);
                 addToHistory(result, response.ok);
                 displayStatus(result, response.ok);
             } catch (error) {
                 const errorResult = { message: "Network error: " + error.message };
                 addToHistory(errorResult, false);
-                showError(errorResult.message);
+                displayStatus(errorResult, false);
             }
         }
 
-        //Check-in status
         function getStatusFromMessage(message) {
-            if (!message) return "UNKNOWN";
-            return message.toLowerCase().includes("out")
-                ? "CHECKED OUT"
-                : "CHECKED IN";
+            return !message ? "UNKNOWN" : message.toLowerCase().includes("out") ? "CHECKED OUT" : "CHECKED IN";
         }
 
-        // Display status
         function displayStatus(result, success) {
             const statusTitle = document.getElementById("statusTitle");
             const statusDetails = document.getElementById("statusDetails");
@@ -792,73 +735,25 @@
                 statusCard.classList.add("status-success");
                 statusTitle.textContent = `✓ ${status}`;
                 statusDetails.innerHTML = `
-                    <div class="detail-row">
-                        <span class="detail-label">Status:</span>
-                        <span class="detail-value"><strong>${status}</strong></span>
-                    </div>
-
-                    <div class="detail-row">
-                        <span class="detail-label">ID:</span>
-                        <span class="detail-value">${result.id}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Group Head Name:</span>
-                        <span class="detail-value">${result.group_head_name}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Token #:</span>
-                        <span class="detail-value">${result.token}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Total Men:</span>
-                        <span class="detail-value">${result.tent_men || 'N/A'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Total Women:</span>
-                        <span class="detail-value">${result.tent_women || 'N/A'}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Building:</span>
-                        <span class="detail-value">${result.building}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Time:</span>
-                        <span class="detail-value">${result.timestamp}</span>
-                    </div>
+                    <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${status}</span></div>
+                    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value">${result.id}</span></div>
+                    <div class="detail-row"><span class="detail-label">Group Head</span><span class="detail-value">${result.group_head_name}</span></div>
+                    <div class="detail-row"><span class="detail-label">Token</span><span class="detail-value">${result.token}</span></div>
+                    <div class="detail-row"><span class="detail-label">Men</span><span class="detail-value">${result.tent_men || 'N/A'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Women</span><span class="detail-value">${result.tent_women || 'N/A'}</span></div>
+                    <div class="detail-row"><span class="detail-label">Tent</span><span class="detail-value">${result.building}</span></div>
+                    <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${result.timestamp}</span></div>
                 `;
             } else {
                 statusCard.classList.add("status-error");
                 statusTitle.textContent = "✗ " + result.message;
-                
-                // Check if this is a building mismatch error
                 if (result.correct_building && result.client_building) {
                     statusDetails.innerHTML = `
-                        <div style="margin-bottom: 10px;">
-                            <strong>⚠️ Wrong Building!</strong>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Group Head:</span>
-                            <span class="detail-value">${result.pilgrim.name}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Token #:</span>
-                            <span class="detail-value">${result.pilgrim.id}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Correct Location:</span>
-                            <span class="detail-value" style="font-weight: 700; color: #c82333;">${result.correct_building}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Men's Tent:</span>
-                            <span class="detail-value">${result.tent_men || 'N/A'}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Women's Tent:</span>
-                            <span class="detail-value">${result.tent_women || 'N/A'}</span>
-                        </div>
-                        <div style="margin-top: 10px; padding: 10px; background: rgba(255,0,0,0.15); border-radius: 4px; text-align: center;">
-                            <strong style="color: #c82333;">Guide pilgrim to ${result.correct_building} Tent ${result.tent_men} for Men and Tent ${result.tent_women} for Women</strong>
-                        </div>
+                        <div class="detail-row"><span class="detail-label">Pilgrim</span><span class="detail-value">${result.pilgrim.name}</span></div>
+                        <div class="detail-row"><span class="detail-label">Token</span><span class="detail-value">${result.pilgrim.id}</span></div>
+                        <div class="detail-row"><span class="detail-label">Correct Tent</span><span class="detail-value" style="font-weight: 700; color: #c82333;">${result.correct_building}</span></div>
+                        <div class="detail-row"><span class="detail-label">Men's Tent</span><span class="detail-value">${result.tent_men || 'N/A'}</span></div>
+                        <div class="detail-row"><span class="detail-label">Women's Tent</span><span class="detail-value">${result.tent_women || 'N/A'}</span></div>
                     `;
                 } else {
                     statusDetails.innerHTML = `<div>${result.message}</div>`;
@@ -868,45 +763,35 @@
             statusCard.style.display = "block";
         }
 
-        // Show error
-        function showError(message) {
-            displayStatus({ message }, false);
-        }
-
-        // Add to history
         function addToHistory(result, success) {
             const time = new Date().toLocaleTimeString();
             const item = document.createElement("div");
             item.className = "history-item" + (success ? "" : " error");
-
             const status = getStatusFromMessage(result.message);
-            const message = success
-                ? `✓ ${status}`
-                : `✗ ${result.message}`;
-
             item.innerHTML = `
-                <div>${message}</div>
+                <div>${success ? '✓ ' + status : '✗ ' + result.message}</div>
                 <div class="history-time">${time}</div>
             `;
-
             historyList.insertBefore(item, historyList.firstChild);
+            while (historyList.children.length > 10) historyList.removeChild(historyList.lastChild);
+        }
 
-            while (historyList.children.length > 10) {
-                historyList.removeChild(historyList.lastChild);
+        function initializeApp() {
+            if (currentClientId && currentBuilding) {
+                displayClientInfo();
+                disableScannerSection(false);
+            } else {
+                clientInfo.classList.remove("show");
+                disableScannerSection(true);
             }
         }
 
-        // Initialize on page load
         initializeApp();
         stopBtn.disabled = true;
 
-        // Check if jsQR loaded
         setTimeout(() => {
             if (typeof jsQR === 'undefined') {
-                console.error("❌ jsQR library failed to load!");
-                alert("QR scanner library failed to load. Try refreshing the page.");
-            } else {
-                console.log("✓ jsQR library loaded successfully!");
+                console.error("jsQR library failed to load");
             }
         }, 2000);
     </script>
