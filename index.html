@@ -473,7 +473,17 @@
     </div>
 
     <script>
-        const API_URL = 'https://qr-scanner-t4qb.onrender.com';
+
+        const getAPIUrl = () => {
+            const hostname = window.location.hostname;
+                    
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return 'http://localhost:5000';
+            }
+            return window.location.origin;
+        };
+        //const API_URL = getAPIUrl();
+        const API_URL = 'https://qr-scanner-1-2k1a.onrender.com';
         console.log('Using API URL:', API_URL);
 
         const video = document.getElementById("video");
@@ -510,8 +520,12 @@
         const logoutBtn = document.getElementById("logoutBtn");
 
         let scanning = false;
-        let currentClientId = localStorage.getItem("currentClientId") || null;
-        let currentBuilding = localStorage.getItem("currentBuilding") || null;
+        
+        // Use sessionStorage instead of localStorage for session token
+        // This ensures each tab has its own session
+        let sessionToken = sessionStorage.getItem("sessionToken") || null;
+        let currentClientId = null;
+        let currentBuilding = null;
 
         // Tab switching
         registerTab.addEventListener("click", () => {
@@ -549,14 +563,9 @@
 
                 const result = await response.json();
                 if (result.status === "success") {
-                    currentClientId = clientId;
-                    currentBuilding = building;
-                    localStorage.setItem("currentClientId", clientId);
-                    localStorage.setItem("currentBuilding", building);
                     regClientId.value = regPassword.value = regBuilding.value = "";
-                    displayClientInfo();
-                    disableScannerSection(false);
-                    alert("✓ Registration successful!");
+                    alert("✓ Registration successful! Please login.");
+                    loginTab.click();
                 } else {
                     alert("✗ " + result.message);
                 }
@@ -587,10 +596,13 @@
 
                 const result = await response.json();
                 if (result.success === true) {
+                    // Store session token in sessionStorage (tab-specific)
+                    sessionToken = result.session_token;
+                    sessionStorage.setItem("sessionToken", sessionToken);
+                    
                     currentClientId = result.client_id;
                     currentBuilding = result.building;
-                    localStorage.setItem("currentClientId", currentClientId);
-                    localStorage.setItem("currentBuilding", currentBuilding);
+                    
                     loginClientId.value = loginPassword.value = "";
                     displayClientInfo();
                     disableScannerSection(false);
@@ -611,10 +623,25 @@
             clientInfo.classList.add("show");
         }
 
-        logoutBtn.addEventListener("click", () => {
-            currentClientId = currentBuilding = null;
-            localStorage.removeItem("currentClientId");
-            localStorage.removeItem("currentBuilding");
+        logoutBtn.addEventListener("click", async () => {
+            try {
+                if (sessionToken) {
+                    await fetch(`${API_URL}/api/logout`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ session_token: sessionToken })
+                    });
+                }
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+            
+            // Clear session data
+            sessionToken = null;
+            currentClientId = null;
+            currentBuilding = null;
+            sessionStorage.removeItem("sessionToken");
+            
             clientInfo.classList.remove("show");
             disableScannerSection(true);
             stopBtn.click();
@@ -624,8 +651,40 @@
             startBtn.disabled = stopBtn.disabled = submitBtn.disabled = qrInput.disabled = disabled;
         }
 
+        // Verify session on page load
+        async function verifySession() {
+            if (!sessionToken) {
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/verify-session`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_token: sessionToken })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    currentClientId = result.client_id;
+                    currentBuilding = result.building;
+                    displayClientInfo();
+                    disableScannerSection(false);
+                    return true;
+                } else {
+                    // Session invalid, clear it
+                    sessionToken = null;
+                    sessionStorage.removeItem("sessionToken");
+                    return false;
+                }
+            } catch (error) {
+                console.error("Session verification error:", error);
+                return false;
+            }
+        }
+
         startBtn.addEventListener("click", async () => {
-            if (!currentClientId) {
+            if (!sessionToken) {
                 alert("Please login first");
                 return;
             }
@@ -657,7 +716,7 @@
         });
 
         submitBtn.addEventListener("click", () => {
-            if (!currentClientId) {
+            if (!sessionToken) {
                 alert("Please login first");
                 return;
             }
@@ -707,10 +766,18 @@
                 const response = await fetch(`${API_URL}/api/scan`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ qr_data: qrData, client_id: currentClientId })
+                    body: JSON.stringify({ qr_data: qrData, session_token: sessionToken })
                 });
 
                 const result = await response.json();
+                
+                // Check if session expired
+                if (result.code === 401) {
+                    alert("Session expired. Please login again.");
+                    logoutBtn.click();
+                    return;
+                }
+                
                 addToHistory(result, response.ok);
                 displayStatus(result, response.ok);
             } catch (error) {
@@ -736,7 +803,6 @@
                 statusTitle.textContent = `✓ ${status}`;
                 statusDetails.innerHTML = `
                     <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${status}</span></div>
-                    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value">${result.id}</span></div>
                     <div class="detail-row"><span class="detail-label">Group Head</span><span class="detail-value">${result.group_head_name}</span></div>
                     <div class="detail-row"><span class="detail-label">Token #</span><span class="detail-value">${result.token}</span></div>
                     <div class="detail-row"><span class="detail-label">Total Men</span><span class="detail-value">${result.tent_men || 'N/A'}</span></div>
@@ -779,11 +845,11 @@
             while (historyList.children.length > 10) historyList.removeChild(historyList.lastChild);
         }
 
-        function initializeApp() {
-            if (currentClientId && currentBuilding) {
-                displayClientInfo();
-                disableScannerSection(false);
-            } else {
+        async function initializeApp() {
+            // Verify if there's an existing session
+            const hasSession = await verifySession();
+            
+            if (!hasSession) {
                 clientInfo.classList.remove("show");
                 disableScannerSection(true);
             }
