@@ -109,7 +109,8 @@
         }
 
         input[type="text"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="number"] {
             padding: 10px 12px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
@@ -119,7 +120,8 @@
         }
 
         input[type="text"]:focus,
-        input[type="password"]:focus {
+        input[type="password"]:focus,
+        input[type="number"]:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -287,6 +289,190 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             font-size: 13px;
+        }
+
+        /* Luggage Input Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .luggage-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .modal-subheader {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .pilgrim-preview {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .preview-row:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .preview-value {
+            color: #212529;
+        }
+
+        .luggage-input-group {
+            margin-bottom: 20px;
+        }
+
+        .luggage-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .luggage-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 20px;
+            text-align: center;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .luggage-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .quick-select {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quick-btn {
+            padding: 10px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-cancel {
+            padding: 12px;
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-confirm {
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-confirm:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .btn-confirm:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
         }
 
         /* Status Card */
@@ -472,18 +658,46 @@
         </div>
     </div>
 
-    <script>
+    <!-- Luggage Input Modal -->
+    <div class="modal-overlay" id="luggageModal">
+        <div class="luggage-modal">
+            <div class="modal-header">🧳 Luggage Count</div>
+            <div class="modal-subheader">Enter the number of luggage items for this pilgrim</div>
+            
+            <div class="pilgrim-preview" id="pilgrimPreview"></div>
+            
+            <div class="luggage-input-group">
+                <label class="luggage-label">Number of Luggage Items</label>
+                <input type="number" id="luggageInput" class="luggage-input" min="0" max="99" value="0" placeholder="0">
+                <div class="quick-select">
+                    <button class="quick-btn" onclick="setLuggage(0)">0</button>
+                    <button class="quick-btn" onclick="setLuggage(1)">1</button>
+                    <button class="quick-btn" onclick="setLuggage(2)">2</button>
+                    <button class="quick-btn" onclick="setLuggage(3)">3</button>
+                    <button class="quick-btn" onclick="setLuggage(4)">4</button>
+                    <button class="quick-btn" onclick="setLuggage(5)">5</button>
+                    <button class="quick-btn" onclick="setLuggage(10)">10</button>
+                    <button class="quick-btn" onclick="setLuggage(15)">15</button>
+                </div>
+            </div>
 
+            <div class="modal-actions">
+                <button class="btn-cancel" id="cancelLuggage">Cancel</button>
+                <button class="btn-confirm" id="confirmLuggage">Check In</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
         const getAPIUrl = () => {
             const hostname = window.location.hostname;
-                    
             if (hostname === 'localhost' || hostname === '127.0.0.1') {
                 return 'http://localhost:5000';
             }
             return window.location.origin;
         };
         //const API_URL = getAPIUrl();
-        const API_URL = 'https://qr-scanner-1-2k1a.onrender.com';
+        const API_URL = 'https://qr-scanner-7rub.onrender.com';
         console.log('Using API URL:', API_URL);
 
         const video = document.getElementById("video");
@@ -519,13 +733,25 @@
         const displayBatch = document.getElementById("displayBatch");
         const logoutBtn = document.getElementById("logoutBtn");
 
+        // Luggage modal
+        const luggageModal = document.getElementById("luggageModal");
+        const pilgrimPreview = document.getElementById("pilgrimPreview");
+        const luggageInput = document.getElementById("luggageInput");
+        const cancelLuggage = document.getElementById("cancelLuggage");
+        const confirmLuggage = document.getElementById("confirmLuggage");
+
         let scanning = false;
-        
-        // Use sessionStorage instead of localStorage for session token
-        // This ensures each tab has its own session
         let sessionToken = sessionStorage.getItem("sessionToken") || null;
         let currentClientId = null;
         let currentBuilding = null;
+        let pendingQRData = null; // Store QR data while waiting for luggage input
+        let verifiedPilgrimData = null; // Store verified pilgrim data
+
+        // Helper function to set luggage count
+        window.setLuggage = function(count) {
+            luggageInput.value = count;
+            luggageInput.focus();
+        };
 
         // Tab switching
         registerTab.addEventListener("click", () => {
@@ -596,7 +822,6 @@
 
                 const result = await response.json();
                 if (result.success === true) {
-                    // Store session token in sessionStorage (tab-specific)
                     sessionToken = result.session_token;
                     sessionStorage.setItem("sessionToken", sessionToken);
                     
@@ -636,7 +861,6 @@
                 console.error("Logout error:", error);
             }
             
-            // Clear session data
             sessionToken = null;
             currentClientId = null;
             currentBuilding = null;
@@ -651,7 +875,6 @@
             startBtn.disabled = stopBtn.disabled = submitBtn.disabled = qrInput.disabled = disabled;
         }
 
-        // Verify session on page load
         async function verifySession() {
             if (!sessionToken) {
                 return false;
@@ -672,7 +895,6 @@
                     disableScannerSection(false);
                     return true;
                 } else {
-                    // Session invalid, clear it
                     sessionToken = null;
                     sessionStorage.removeItem("sessionToken");
                     return false;
@@ -722,7 +944,7 @@
             }
             const data = qrInput.value.trim();
             if (data) {
-                processQR(data);
+                verifyPilgrim(data);
                 qrInput.value = "";
             }
         });
@@ -748,7 +970,7 @@
 
                     if (code) {
                         scanning = false;
-                        processQR(code.data);
+                        verifyPilgrim(code.data);
                         stopBtn.click();
                         return;
                     }
@@ -760,10 +982,11 @@
             requestAnimationFrame(scanQRCode);
         }
 
-        async function processQR(qrData) {
+        // Step 1: Verify pilgrim and show luggage input modal
+        async function verifyPilgrim(qrData) {
             try {
                 statusCard.style.display = "none";
-                const response = await fetch(`${API_URL}/api/scan`, {
+                const response = await fetch(`${API_URL}/api/verify-pilgrim`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ qr_data: qrData, session_token: sessionToken })
@@ -777,15 +1000,122 @@
                     logoutBtn.click();
                     return;
                 }
-                
-                addToHistory(result, response.ok);
-                displayStatus(result, response.ok);
+
+                if (!result.success) {
+                    // Show error immediately (building mismatch, pilgrim not found, etc.)
+                    addToHistory(result, false);
+                    displayStatus(result, false);
+                    return;
+                }
+
+                // Success - store data and show luggage modal
+                pendingQRData = qrData;
+                verifiedPilgrimData = result;
+                showLuggageModal(result);
+
             } catch (error) {
                 const errorResult = { message: "Network error: " + error.message };
                 addToHistory(errorResult, false);
                 displayStatus(errorResult, false);
             }
         }
+
+        // Show luggage input modal with pilgrim details
+        function showLuggageModal(pilgrimData) {
+            // Display pilgrim preview
+            pilgrimPreview.innerHTML = `
+                <div class="preview-row">
+                    <span class="preview-label">Group Head</span>
+                    <span class="preview-value">${pilgrimData.group_head_name}</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Token #</span>
+                    <span class="preview-value">${pilgrimData.token}</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Tent Men</span>
+                    <span class="preview-value">${pilgrimData.tent_men || 'N/A'}</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Tent Women</span>
+                    <span class="preview-value">${pilgrimData.tent_women || 'N/A'}</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Building</span>
+                    <span class="preview-value">${pilgrimData.building}</span>
+                </div>
+            `;
+
+            // Reset and show modal
+            luggageInput.value = 0;
+            luggageModal.classList.add("show");
+            luggageInput.focus();
+        }
+
+        // Cancel luggage input
+        cancelLuggage.addEventListener("click", () => {
+            luggageModal.classList.remove("show");
+            pendingQRData = null;
+            verifiedPilgrimData = null;
+        });
+
+        // Step 2: Complete check-in with luggage count
+        confirmLuggage.addEventListener("click", async () => {
+            const luggageCount = parseInt(luggageInput.value) || 0;
+
+            if (luggageCount < 0) {
+                alert("Luggage count cannot be negative");
+                return;
+            }
+
+            confirmLuggage.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/complete-checkin`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        qr_data: pendingQRData, 
+                        session_token: sessionToken,
+                        luggage_count: luggageCount
+                    })
+                });
+
+                const result = await response.json();
+                
+                // Close modal
+                luggageModal.classList.remove("show");
+                
+                // Check if session expired
+                if (result.code === 401) {
+                    alert("Session expired. Please login again.");
+                    logoutBtn.click();
+                    return;
+                }
+                
+                addToHistory(result, response.ok);
+                displayStatus(result, response.ok);
+
+                // Clear pending data
+                pendingQRData = null;
+                verifiedPilgrimData = null;
+
+            } catch (error) {
+                luggageModal.classList.remove("show");
+                const errorResult = { message: "Network error: " + error.message };
+                addToHistory(errorResult, false);
+                displayStatus(errorResult, false);
+            } finally {
+                confirmLuggage.disabled = false;
+            }
+        });
+
+        // Allow Enter key to confirm
+        luggageInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                confirmLuggage.click();
+            }
+        });
 
         function getStatusFromMessage(message) {
             return !message ? "UNKNOWN" : message.toLowerCase().includes("out") ? "CHECKED OUT" : "CHECKED IN";
@@ -808,6 +1138,7 @@
                     <div class="detail-row"><span class="detail-label">Total Men</span><span class="detail-value">${result.tent_men || 'N/A'}</span></div>
                     <div class="detail-row"><span class="detail-label">Total Women</span><span class="detail-value">${result.tent_women || 'N/A'}</span></div>
                     <div class="detail-row"><span class="detail-label">Assigned Tent</span><span class="detail-value">${result.building}</span></div>
+                    <div class="detail-row"><span class="detail-label">Luggage Count</span><span class="detail-value" style="font-weight: 700; color: #28a745;">${result.luggage}</span></div>
                     <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${result.timestamp}</span></div>
                 `;
             } else {
@@ -837,8 +1168,9 @@
             const item = document.createElement("div");
             item.className = "history-item" + (success ? "" : " error");
             const status = getStatusFromMessage(result.message);
+            const luggageInfo = result.luggage !== undefined ? ` (${result.luggage} luggage)` : '';
             item.innerHTML = `
-                <div>${success ? '✓ ' + status : '✗ ' + result.message}</div>
+                <div>${success ? '✓ ' + status + luggageInfo : '✗ ' + result.message}</div>
                 <div class="history-time">${time}</div>
             `;
             historyList.insertBefore(item, historyList.firstChild);
@@ -846,7 +1178,6 @@
         }
 
         async function initializeApp() {
-            // Verify if there's an existing session
             const hasSession = await verifySession();
             
             if (!hasSession) {
